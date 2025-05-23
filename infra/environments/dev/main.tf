@@ -7,10 +7,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "your-terraform-state-bucket"
+    bucket         = "ui-upload-terraform-state"
     key            = "dev/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "terraform-lock"
     encrypt        = true
   }
 }
@@ -56,7 +55,21 @@ module "cognito" {
 
   user_pool_name        = "ui-upload-${local.environment}"
   authenticated_role_arn = module.iam.role_arn
-  callback_urls         = ["http://localhost:8501"]
-  logout_urls           = ["http://localhost:8501"]
+  callback_urls         = [
+    "https://localhost:8501",
+    "https://localhost:8501/",
+    "https://127.0.0.1:8501",
+    "https://127.0.0.1:8501/",
+    "https://*.ngrok-free.app",
+    "https://*.ngrok.io/"
+  ]
+  logout_urls           = [
+    "https://localhost:8501",
+    "https://localhost:8501/",
+    "https://127.0.0.1:8501",
+    "https://127.0.0.1:8501/",
+    "https://*.ngrok-free.app",
+    "https://*.ngrok.io/"
+  ]
   tags                  = local.tags
-} 
+}
