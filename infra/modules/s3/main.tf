@@ -39,32 +39,20 @@ resource "aws_s3_bucket_public_access_block" "this" {
   restrict_public_buckets = true
 }
 
-# Lifecycle rule to transition objects to STANDARD_IA after 30 days
+# Lifecycle rule to delete old versions and optimize storage
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   bucket = aws_s3_bucket.this.id
 
   rule {
-    id     = "transition-to-standard-ia"
+    id     = "cleanup-old-versions"
     status = "Enabled"
 
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
+    filter {
+      prefix = ""
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
     }
   }
 }
-
-# Enable intelligent tiering for cost optimization
-resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
-  bucket = aws_s3_bucket.this.id
-  name   = "EntireBucket"
-
-  tiering {
-    access_tier = "DEEP_ARCHIVE_ACCESS"
-    days        = 90
-  }
-  tiering {
-    access_tier = "ARCHIVE_ACCESS"
-    days        = 30
-  }
-} 
